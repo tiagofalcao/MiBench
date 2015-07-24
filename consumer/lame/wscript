@@ -1,0 +1,42 @@
+﻿#!/usr/bin/env python
+# encoding: utf-8
+
+from waflib import Utils
+
+def configure(ctx):
+    print("Configure from: " + ctx.path.abspath())
+
+def build(ctx):
+    print("Build from: " + ctx.path.abspath())
+
+    import os
+    import os.path
+    import re
+
+    abspath = ctx.path.abspath()
+    lib = os.path.basename(abspath)
+    install_dir = "${DATADIR}/" +  lib
+    prj = "lame3.70"
+
+    defines = [ "HAVEMPGLIB", "LAMEPARSE", "NDEBUG", "__NO_MATH_INLINES", "LAMESNDFILE" ]
+
+    src = [ "brhist.c", "formatBitstream.c", "fft.c", "get_audio.c", "l3bitstream.c", "id3tag.c", "ieeefloat.c", "lame.c", "newmdct.c", "parse.c", "portableio.c", "psymodel.c", "quantize.c", "quantize-pvt.c", "vbrquantize.c", "reservoir.c", "tables.c", "takehiro.c", "timestatus.c", "util.c", "VbrTag.c", "version.c", "gtkanal.c", "gpkplotting.c", "mpglib/common.c", "mpglib/dct64_i386.c", "mpglib/decode_i386.c", "mpglib/layer3.c", "mpglib/tabinit.c", "mpglib/interface.c", "mpglib/main.c" ]
+    print lib, src
+    src = [os.path.join(prj,f) for f in src]
+    ctx.stlib(features='c cstlib', target=lib, source=src, defines=defines)
+
+    name = lib + ".x"
+    src = [ "main.c" ]
+    src = [os.path.join(prj,f) for f in src]
+    task = ctx(features='c cprogram', target=name, source=src, use=[lib])
+    task.install_path = install_dir
+    task.chmod = Utils.O755
+
+
+    #ctx.install_files(install_dir, ['config.tsv', 'base_output'])
+    #ctx.install_files(install_dir, [f for f in os.listdir(abspath) if re.match(r'input_.*$', f)])
+    #ctx.install_files(install_dir, ['check', 'progress'], chmod=Utils.O755)
+
+	
+
+

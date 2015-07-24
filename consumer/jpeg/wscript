@@ -1,0 +1,47 @@
+﻿#!/usr/bin/env python
+# encoding: utf-8
+
+from waflib import Utils
+
+def configure(ctx):
+    print("Configure from: " + ctx.path.abspath())
+
+def build(ctx):
+    print("Build from: " + ctx.path.abspath())
+
+    import os
+    import os.path
+    import re
+
+    abspath = ctx.path.abspath()
+    lib = os.path.basename(abspath)
+    install_dir = "${DATADIR}/" +  lib
+
+    src = [ "jcapimin.c", "jcapistd.c", "jctrans.c", "jcparam.c", "jdatadst.c", "jcinit.c", "jcmaster.c", "jcmarker.c", "jcmainct.c", "jcprepct.c", "jccoefct.c", "jccolor.c", "jcsample.c", "jchuff.c", "jcphuff.c", "jcdctmgr.c", "jfdctfst.c", "jfdctflt.c", "jfdctint.c", "jdapimin.c", "jdapistd.c", "jdtrans.c", "jdatasrc.c", "jdmaster.c", "jdinput.c", "jdmarker.c", "jdhuff.c", "jdphuff.c", "jdmainct.c", "jdcoefct.c", "jdpostct.c", "jddctmgr.c", "jidctfst.c", "jidctflt.c", "jidctint.c", "jidctred.c", "jdsample.c", "jdcolor.c", "jquant1.c", "jquant2.c", "jdmerge.c", "jcomapi.c", "jutils.c", "jerror.c", "jmemmgr.c", "jmemnobs.c" ]
+    print lib, src
+    src = [os.path.join("jpeg-6a",f) for f in src]
+    ctx.stlib(features='c cstlib', target=lib, source=src)
+
+    name="cjpeg.x"
+    src = [ "cjpeg.c", "rdppm.c", "rdgif.c", "rdtarga.c", "rdrle.c", "rdbmp.c", "rdswitch.c", "cdjpeg.c"]
+    src = [os.path.join("jpeg-6a",f) for f in src]
+    task = ctx(features='c cprogram', target=name, source=src, use=[lib])
+    task.install_path = install_dir
+    task.chmod = Utils.O755
+
+
+    name="djpeg.x"
+    src = [ "djpeg.c", "wrppm.c", "wrgif.c", "wrtarga.c", "wrrle.c", "wrbmp.c", "rdcolmap.c", "cdjpeg.c"]
+    src = [os.path.join("jpeg-6a",f) for f in src]
+    task = ctx(features='c cprogram', target=name, source=src, use=[lib])
+    task.install_path = install_dir
+    task.chmod = Utils.O755
+
+
+    #ctx.install_files(install_dir, ['config.tsv', 'base_output'])
+    #ctx.install_files(install_dir, [f for f in os.listdir(abspath) if re.match(r'input_.*$', f)])
+    #ctx.install_files(install_dir, ['check', 'progress'], chmod=Utils.O755)
+
+	
+
+

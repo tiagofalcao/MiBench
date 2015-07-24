@@ -1,0 +1,39 @@
+﻿#!/usr/bin/env python
+# encoding: utf-8
+
+from waflib import Utils
+
+def configure(ctx):
+    print("Configure from: " + ctx.path.abspath())
+
+def build(ctx):
+    print("Build from: " + ctx.path.abspath())
+
+    import os
+    import os.path
+    import re
+
+    abspath = ctx.path.abspath()
+    lib = os.path.basename(abspath)
+    install_dir = "${DATADIR}/" +  lib
+    prj = "src"
+
+    src = [ "add.c", "code.c", "debug.c", "decode.c", "long_term.c", "lpc.c", "preprocess.c", "rpe.c", "gsm_destroy.c", "gsm_decode.c", "gsm_encode.c", "gsm_explode.c", "gsm_implode.c", "gsm_create.c", "gsm_print.c", "gsm_option.c", "short_term.c", "table.c" ]
+    print lib, src
+    src = [os.path.join(prj,f) for f in src]
+    ctx.stlib(features='c cstlib', target=lib, source=src, includes=["./inc/"], defines=["SASR"])
+
+    name = "toast.x"
+    src = [ "toast.c", "toast_lin.c", "toast_ulaw.c", "toast_alaw.c", "toast_audio.c" ]
+    src = [os.path.join(prj,f) for f in src]
+    task = ctx(features='c cprogram', target=name, source=src, use=[lib], includes=["./inc/"])
+    task.install_path = install_dir
+    task.chmod = Utils.O755
+
+    #ctx.install_files(install_dir, ['config.tsv', 'base_output'])
+    #ctx.install_files(install_dir, [f for f in os.listdir(abspath) if re.match(r'input_.*$', f)])
+    #ctx.install_files(install_dir, ['check', 'progress'], chmod=Utils.O755)
+
+	
+
+
